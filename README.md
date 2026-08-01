@@ -30,4 +30,3 @@ The included GitHub Pages workflow builds and publishes on every push to `main`.
 3. Add repository secret `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
 A custom Learn domain can point to the GitHub Pages deployment later.
-
