@@ -130,7 +130,11 @@ export default function App() {
       return;
     }
     if (!supabase || !session) return tell("info", "Enrollment will activate when the shared BrownGlobal backend is connected.");
-    if (enrolledIds.includes(course.id)) return tell("info", `${course.title} is already in your learning dashboard.`);
+    if (enrolledIds.includes(course.id)) {
+      go("dashboard");
+      tell("info", `${course.title} is ready in your learning dashboard.`);
+      return;
+    }
     const { error } = await supabase.from("learning_enrollments").insert({ user_id: session.user.id, course_id: course.id });
     if (error) return tell("error", error.message);
     setEnrolledIds((current) => [...new Set([...current, course.id])]);
@@ -176,8 +180,8 @@ function Header({ view, go, session, hasPlus, onAuth, onSignOut }: { view: View;
   const [open, setOpen] = useState(false);
   return <header className="topbar">
     <button className="brand" onClick={() => go("home")} aria-label="Learn home"><img src="/learn-logo.svg" alt=""/><span><strong>learn</strong><small>by BrownGlobal</small></span></button>
-    <button className="menu" onClick={() => setOpen(!open)} aria-expanded={open}>Menu</button>
-    <nav className={open ? "open" : ""}>{views.map((item) => <button className={view === item.key ? "active" : ""} key={item.key} onClick={() => { go(item.key); setOpen(false); }}>{item.label}</button>)}</nav>
+    <button className="menu" onClick={() => setOpen(!open)} aria-controls="learn-navigation" aria-expanded={open}>{open ? "Close" : "Menu"}</button>
+    <nav id="learn-navigation" className={open ? "open" : ""} aria-label="Primary navigation">{views.map((item) => <button className={view === item.key ? "active" : ""} key={item.key} onClick={() => { go(item.key); setOpen(false); }}>{item.label}</button>)}{session && <button className={view === "dashboard" ? "active mobile-dashboard-link" : "mobile-dashboard-link"} onClick={() => { go("dashboard"); setOpen(false); }}>My learning</button>}</nav>
     <div className="account-actions">{hasPlus && <span className="plan-chip">PLUS</span>}{session ? <><button className="text-button" onClick={() => go("dashboard")}>My learning</button><button className="button compact secondary" onClick={onSignOut}>Sign out</button></> : <button className="button compact" onClick={onAuth}>Sign in</button>}</div>
   </header>;
 }
@@ -203,7 +207,7 @@ function Catalog({ courses, enrolledIds, hasPlus, enroll }: { courses: Course[];
   const [filter, setFilter] = useState("All");
   const schools = ["All", ...new Set(courses.map((course) => course.school))];
   const visible = filter === "All" ? courses : courses.filter((course) => course.school === filter);
-  return <main className="page"><header className="page-hero mint"><span className="eyebrow dark">Course catalog</span><h1>Choose what you want to build next.</h1><p>Enroll immediately. No application is required for open courses.</p></header><section className="section catalog"><div className="filters">{schools.map((school) => <button key={school} className={filter === school ? "active" : ""} onClick={() => setFilter(school)}>◊~-¢Gß≤⁄Óù∆≠yﬁ</div>}</section></main>;
+  return <main className="page"><header className="page-hero mint"><span className="eyebrow dark">Course catalog</span><h1>Choose what you want to build next.</h1><p>Enroll immediately. No application is required for open courses.</p></header><section className="section catalog"><div className="filters">{schools.map((school) => <button key={school} className={filter === school ? "active" : ""} onClick={() => setFilter(school)}>{school}</button>)}</div><div className="course-grid">{visible.map((course) => <CourseCard key={course.id} course={course} enrolled={enrolledIds.includes(course.id)} onClick={() => enroll(course)} />)}</div>{!hasPlus && <div className="inline-promo"><strong>Learn Plus unlocks every course and interactive class.</strong><span>It is also included with an active BrownGlobal Business membership.</span></div>}</section></main>;
 }
 
 function Live({ sessions, registeredIds, register }: { sessions: LiveSession[]; registeredIds: string[]; register: (item: LiveSession) => void }) {
@@ -242,7 +246,7 @@ function Dashboard({ session, enrolledCourses, sessions, hasPlus, plusSource, go
 }
 
 function Pricing({ session, go, onAuth, tell }: { session: Session | null; go: (view: View) => void; onAuth: () => void; tell: (tone: NoticeTone, text: string) => void }) {
-  return <main className="page"><header className="page-hero mint"><span className="eyebrow dark">Simple access</span><h1>Start free. Go deeper when it matters.</h1><p>No application is required to join Learn or enroll in open courses.</p></header><section className="section pricing-grid"><article><span className="plan-label">LEARN FREE</span><h2>$0</h2><p>For anyone ready to begin.</p><ul><li>Selected complete courses</li><li>Public live online classes</li><li>Basic projects and progress</li><li>Free Build Challenge</li><li>Eligibility to apply for the Wave series</li></ul><button className="button secondary" onClick={() => session ? go("catalog") : onAuth()}>{session ? "Browse free courses" : "Create free account"}</button></article><article className="featured-plan"><span className="plan-label">LEARN PLUS</span><h2>$9.99 <small>/ month</small></h2><p>Or $79 annually, with regional pricing.</p><ul><li>Complete course catalog</li><li>Interactive live classes and replays</li><li>Assignments and instructor feedback</li><li>Verified completion certificates</li><li>Portfolio and advanced learning records</li></ul><button className="button light" onClick={() => tell("info", "Learn Plus checkout will open when BrownGlobal billing is activated.")}>Choose Learn Plus</button></article><article><span className="plan-label">BROWNGLOBAL BUSINESS</span><h2>Included</h2><p>Learn Plus is included while an eligible Business membership is active.</p><ul><li>Learn Plus access for included members</li><li>Shared BrownGlobal workspace</li><li>Studio, Reach and Wave benefits</li><li>Central billing and member management</li><li>Business learning pathways</li></ul><a className="button secondary" href="mailto:admin@brownglobal.app?subject=BrownGlobal%20Business">Ask about Business</a></article></section></main>;
+  return <main className="page"><header className="page-hero mint"><span className="eyebrow dark">Simple access</span><h1>Start free. Go deeper when it matters.</h1><p>No application is required to join Learn or enroll in open courses.</p></header><section className="section pricing-grid"><article><span className="plan-label">LEARN FREE</span><h2>$0</h2><p>For anyone ready to begin.</p><ul><li>Selected complete courses</li><li>Public live online classes</li><li>Basic projects and progress</li><li>Free Build Challenge</li><li>Eligibility to apply for the Wave series</li></ul><button className="button secondary" onClick={() => session ? go("catalog") : onAuth()}>{session ? "Browse free courses" : "Create free account"}</button></article><article className="featured-plan"><span className="plan-label">LEARN PLUS</span><h2>$4.99 <small>/ month</small></h2><p>Or $49.99 annually, with regional pricing.</p><ul><li>Complete course catalog</li><li>Interactive live classes and replays</li><li>Assignments and instructor feedback</li><li>Verified completion certificates</li><li>Portfolio and advanced learning records</li></ul><button className="button light" onClick={() => tell("info", "Learn Plus checkout will open when BrownGlobal billing is activated.")}>Choose Learn Plus</button></article><article><span className="plan-label">BROWNGLOBAL BUSINESS</span><h2>Included</h2><p>Learn Plus is included while an eligible Business membership is active.</p><ul><li>Learn Plus access for included members</li><li>Shared BrownGlobal workspace</li><li>Studio, Reach and Wave benefits</li><li>Central billing and member management</li><li>Business learning pathways</li></ul><a className="button secondary" href="mailto:admin@brownglobal.app?subject=BrownGlobal%20Business">Ask about Business</a></article></section></main>;
 }
 
 function AuthDialog({ mode, setMode, close, tell }: { mode: AuthMode; setMode: (mode: AuthMode) => void; close: () => void; tell: (tone: NoticeTone, text: string) => void }) {
@@ -261,3 +265,4 @@ function AuthDialog({ mode, setMode, close, tell }: { mode: AuthMode; setMode: (
 function Footer({ go }: { go: (view: View) => void }) {
   return <footer className="footer"><div className="brand footer-brand"><img src="/learn-logo.svg" alt=""/><span><strong>learn</strong><small>by BrownGlobal</small></span></div><p>Practical online education for skills, careers and businesses.</p><div>{views.slice(0,4).map((item)=><button key={item.key} onClick={() => go(item.key)}>{item.label}</button>)}</div><aside><a href="mailto:admin@brownglobal.app">admin@brownglobal.app</a><span>¬© 2026 BrownGlobal Holdings LLC</span></aside></footer>;
 }
+
