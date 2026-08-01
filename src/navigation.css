@@ -1,0 +1,36 @@
+.mobile-dashboard-link {
+  display: none;
+}
+
+@media (max-width: 1050px) {
+  .topbar nav {
+    box-shadow: 0 18px 45px rgba(12, 17, 16, 0.12);
+  }
+
+  .mobile-dashboard-link {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 680px) {
+  .topbar {
+    gap: 10px;
+  }
+
+  .menu {
+    margin-left: auto;
+  }
+
+  .topbar nav.open {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 12px 16px 16px;
+  }
+
+  .topbar nav button {
+    min-height: 42px;
+    text-align: left;
+  }
+}
+
