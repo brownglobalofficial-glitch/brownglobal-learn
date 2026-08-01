@@ -5,7 +5,7 @@ Learn is BrownGlobal's online learning platform: structured self-paced courses, 
 ## Product model
 
 - **Free:** core courses, selected live classes, the Build Challenge, and eligibility to apply for the Venture Challenge.
-- **Learn Plus:** full course library, replays, guided pathways, feedback, and completion records. Launch price: **$9.99/month or $79/year**.
+- **Learn Plus:** full course library, replays, guided pathways, feedback, and completion records. Launch price: **$4.99/month or $49.99/year**.
 - **BrownGlobal Business:** includes Learn Plus for eligible members; Learn does not require a second subscription.
 - **Competition:** applying and competing never requires payment.
 
@@ -30,3 +30,4 @@ The included GitHub Pages workflow builds and publishes on every push to `main`.
 3. Add repository secret `VITE_SUPABASE_PUBLISHABLE_KEY`.
 
 A custom Learn domain can point to the GitHub Pages deployment later.
+
